@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, send_file
-from app.yolopred import bounding_box
-from app.hairremoval import hairremoval
-from app.sampred import area_predict
+from yolopred import bounding_box
+from hairremoval import hairremoval
+from sampred import area_predict
 import cv2
 import numpy as np
 import io
