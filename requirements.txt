@@ -1,4 +1,5 @@
 ﻿--index-url https://download.pytorch.org/whl/cpu
+
 Flask==3.0.2
 gunicorn==22.0.0
 imageio==2.34.2
