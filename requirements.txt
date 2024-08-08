@@ -9,8 +9,8 @@ pillow==10.4.0
 requests==2.32.3
 scikit-image==0.24.0
 segment_anything @ git+https://github.com/facebookresearch/segment-anything.git@6fdee8f2727f4506cfbbe553e23b895e27956588
-torch==2.2.1
-torchaudio==2.2.1
+torch==2.2.1+cpu
+torchaudio==2.2.1+cpu
 torchmetrics==1.4.0.post0
-torchvision==0.17.1
+torchvision==0.17.1+cpu
 ultralytics==8.2.68
