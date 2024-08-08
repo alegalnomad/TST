@@ -4,7 +4,7 @@ imageio==2.34.2
 matplotlib==3.8.3
 matplotlib-inline==0.1.6
 numpy==1.26.4
-opencv-python-headless==4.10.0.84
+opencv-contrib-python-headless==4.10.0.84
 pillow==10.4.0
 requests==2.32.3
 scikit-image==0.24.0
