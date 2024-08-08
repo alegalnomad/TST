@@ -5,7 +5,7 @@ from segment_anything.utils.transforms import ResizeLongestSide
 import cv2
 
 # Load Model (do this only once when the app starts)
-sam_model = sam_model_registry['vit_b'](checkpoint="sam_model_latest.pth")
+sam_model = sam_model_registry['vit_b'](checkpoint="app/sam_model_latest.pth")
 sam_transform = ResizeLongestSide(1024)
 
 def area_predict(image, box):
