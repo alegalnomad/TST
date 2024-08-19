@@ -17,7 +17,7 @@ def clip_mask_to_box(mask, box):
 
 def area_predict(image, box):
     if len(box) == 0: #return the image as is if there was no bounding box detected
-        return image,400  
+        return image
     
     box = np.array(box).reshape(1, 4) 
     input_size = image.shape[:2]
