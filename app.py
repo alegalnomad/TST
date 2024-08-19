@@ -55,10 +55,10 @@ def predict():
             
             img = Image.fromarray(prediction)
             img_io = io.BytesIO()
-            img.save(img_io, 'JPG', quality=100)
+            img.save(img_io, 'JPEG', quality=95)
             img_io.seek(0)
             
-            return send_file(img_io, mimetype='image/jpg')
+            return send_file(img_io, mimetype='image/jpeg')
         
         except Exception as e:
             logging.error(f"Error during prediction: {str(e)}")
