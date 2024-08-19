@@ -6,3 +6,4 @@ segment_anything==1.0
 torch==2.2.1
 ultralytics==8.2.68
 gunicorn
+onnxruntime
