@@ -5,7 +5,7 @@ from segment_anything.utils.transforms import ResizeLongestSide
 import cv2
 
 #Load model
-sam_model = sam_model_registry['vit_b'](checkpoint="Re_sam_model_best.pth")
+sam_model = sam_model_registry['vit_b'](checkpoint="sam_model_best.pth")
 sam_model.to(torch.device('cpu'))
 sam_transform = ResizeLongestSide(1024)
 
