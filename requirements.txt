@@ -7,3 +7,4 @@ torch==2.2.1
 ultralytics==8.2.68
 gunicorn
 onnxruntime
+onnx
