@@ -3,26 +3,12 @@ import numpy as np
 import cv2
 
 # Load a model
-model = YOLO("yolofinetuned.pt")  # pretrained YOLOv8n model
+model = YOLO("yolofinetuned.onnx")  # pretrained YOLOv8n model
 
 def resize_image(img, target_size=(600, 450)):
     return cv2.resize(img, target_size)
 
 def bounding_box(image):
-
-    try:
-        print("Trying YOLOInfer")
-        results = model([image], stream=True)  # return a generator of Results objects
-
-
-        for result in results:
-            boxes = result.boxes  
-        if len(boxes)>0:
-            return np.array(boxes.xyxy[0].cpu())
-    
-    except:
-        print("YOLOInfer failed")
-        pass
 
     try:
         print("Trying Original YOLOPred")
@@ -55,5 +41,23 @@ def bounding_box(image):
     except:
         print("Original failed")
         pass
+
+    try:
+        print("Trying YOLOInfer")
+        results = model([image], stream=True)  # return a generator of Results objects
+
+
+        for result in results:
+            boxes = result.boxes  
+        if len(boxes)>0:
+            return np.array(boxes.xyxy[0].cpu())
+    
+    except:
+        print("YOLOInfer failed")
+        pass
+    
+
+        
+        
 
     return np.array([])  # Return an empty array if no bounding box is detected
