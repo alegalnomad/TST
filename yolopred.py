@@ -11,6 +11,20 @@ def resize_image(img, target_size=(600, 450)):
 def bounding_box(image):
 
     try:
+        print("Trying YOLOInfer")
+        results = model([image], stream=True)  # return a generator of Results objects
+
+
+        for result in results:
+            boxes = result.boxes  
+        if len(boxes)>0:
+            return np.array(boxes.xyxy[0].cpu())
+    
+    except:
+        print("YOLOInfer failed")
+        pass
+
+    try:
         print("Trying Original YOLOPred")
         # Resize image
         original_size = image.shape[:2]  # (height, width)
@@ -41,23 +55,5 @@ def bounding_box(image):
     except:
         print("Original failed")
         pass
-
-    try:
-        print("Trying YOLOInfer")
-        results = model([image], stream=True)  # return a generator of Results objects
-
-
-        for result in results:
-            boxes = result.boxes  
-        if len(boxes)>0:
-            return np.array(boxes.xyxy[0].cpu())
-    
-    except:
-        print("YOLOInfer failed")
-        pass
-    
-
-        
-        
 
     return np.array([])  # Return an empty array if no bounding box is detected
