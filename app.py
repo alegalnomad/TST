@@ -3,7 +3,7 @@ from yolopred import bounding_box
 from hairremoval import hairremoval
 from sampred import area_predict
 import cv2
-import numpy as np
+import numpy as np 
 import io
 import logging
 from PIL import Image
@@ -17,7 +17,6 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def read_image_file(file):
-    # Read image file into a numpy array
     nparr = np.frombuffer(file.read(), np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     return img
@@ -33,30 +32,25 @@ def predict():
 
         try:
             logging.info(f"Received file: {file.filename}, Size: {file.content_length}")
-            
-            # Convert file to OpenCV image
-            img = read_image_file(file)
-            
+        
+            img = read_image_file(file)  
+           
             logging.info("Starting hair removal")
             img_no_hair = hairremoval(img)
             logging.info("Hair removal complete")
             
             logging.info("Starting bounding box detection")
             bbox = bounding_box(img_no_hair)
-            print(type(bbox))
-            print(bbox)
+            print("Bounding Box: ", bbox)
             logging.info("Bounding box detection complete")
-            
-            if len(bbox) == 0:
-                return "No lesion detected", 400
-            
+
             logging.info("Starting area prediction")
             prediction = area_predict(img_no_hair, bbox)
             logging.info("Area prediction complete")
             if len(prediction.shape) == 2 or prediction.shape[2] == 1:
                 prediction = cv2.cvtColor(prediction, cv2.COLOR_GRAY2RGB)
         
-            #Ensure the image is in RGB format (OpenCV uses BGR by default)
+            
             prediction = cv2.cvtColor(prediction, cv2.COLOR_BGR2RGB)
             
             img = Image.fromarray(prediction)
@@ -71,4 +65,4 @@ def predict():
             return jsonify({'error': f'Error during prediction: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080 ,debug=True)
+    app.run(debug=True)
