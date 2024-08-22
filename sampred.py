@@ -39,7 +39,7 @@ def area_predict(image, box):
     with torch.no_grad():
         
         ts_img_embedding = sam_model.image_encoder(input_image)
-        
+        # convert box
         bbox = sam_transform.apply_boxes(box, input_size)
         box_torch = torch.as_tensor(bbox, dtype=torch.float, device=sam_model.device)
         box_torch = box_torch.unsqueeze(1) 
