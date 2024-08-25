@@ -5,7 +5,7 @@ from segment_anything.utils.transforms import ResizeLongestSide
 import cv2
 
 #Load model
-sam_model = sam_model_registry['vit_b'](checkpoint="sam_model_cpu.pth")
+sam_model = sam_model_registry['vit_l'](checkpoint="large_sam_model_cpu.pth")
 sam_model.to(torch.device('cpu'))
 sam_transform = ResizeLongestSide(1024)
 
@@ -17,7 +17,7 @@ def clip_mask_to_box(mask, box):
 
 def area_predict(image, box):
     if len(box) == 0: #return the image as is if there was no bounding box detected
-        return image
+        return image 
     
     box = np.array(box).reshape(1, 4) 
     input_size = image.shape[:2]
@@ -39,7 +39,7 @@ def area_predict(image, box):
     with torch.no_grad():
         
         ts_img_embedding = sam_model.image_encoder(input_image)
-        # convert box
+        
         bbox = sam_transform.apply_boxes(box, input_size)
         box_torch = torch.as_tensor(bbox, dtype=torch.float, device=sam_model.device)
         box_torch = box_torch.unsqueeze(1) 
