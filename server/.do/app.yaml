@@ -1,0 +1,5 @@
+envs:
+  - key: BUILDPACK_URL
+    value: https://github.com/heroku/heroku-buildpack-apt
+  - key: APT_PACKAGES
+    value: libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender1
