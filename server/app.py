@@ -52,6 +52,9 @@ def predict():
             # Perform center-weighted crop
             cropped_img = center_crop(img, crop_width, crop_height)
            
+            original_cropped = cropped_img.copy()
+            original_cropped = cv2.cvtColor(original_cropped, cv2.COLOR_BGR2RGB)
+
             logging.info("Starting hair removal")
             img_no_hair = hairremoval(cropped_img)
             logging.info("Hair removal complete")
@@ -92,7 +95,9 @@ def predict():
             
             prediction = cv2.cvtColor(prediction, cv2.COLOR_BGR2RGB)
             
-            img = Image.fromarray(prediction)
+            combined_img = np.vstack((original_cropped, prediction))
+                                     
+            img = Image.fromarray(combined_img)
             img_io = io.BytesIO()
             img.save(img_io, 'PNG', quality=100)
             img_io.seek(0)
