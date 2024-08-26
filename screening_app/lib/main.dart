@@ -9,12 +9,11 @@ import 'package:image/image.dart' as img;
 import 'package:exif/exif.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 late List<CameraDescription> cameras;
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");
+  //await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   try {
     cameras = await availableCameras();
@@ -40,13 +39,13 @@ class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({super.key});
 
   @override
-  TakePictureScreenState createState() => TakePictureScreenState();
+  State<TakePictureScreen> createState() => TakePictureScreenState();
 }
 
 class TakePictureScreenState extends State<TakePictureScreen> with WidgetsBindingObserver {
   CameraController? _controller;
   bool _isCameraInitialized = false;
-  FlashMode _flashMode = FlashMode.off; 
+  FlashMode _flashMode = FlashMode.off;
 
   @override
   void initState() {
@@ -63,62 +62,69 @@ class TakePictureScreenState extends State<TakePictureScreen> with WidgetsBindin
   }
 
   @override
-void didChangeAppLifecycleState(AppLifecycleState state) {
-  if (state == AppLifecycleState.resumed) {
-    _initializeCamera();
-  } else if (state == AppLifecycleState.paused) {
-    _toggleFlash(forceOff: true);
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_controller == null || !_controller!.value.isInitialized) {
+      return;
+    }
+    if (state == AppLifecycleState.inactive) {
+      _disposeCamera();
+    } else if (state == AppLifecycleState.resumed) {
+      _initializeCamera();
+    }
   }
-}
 
-  Future<void> _initializeCamera() async {
+  Future<void> _disposeCamera() async {
     if (_controller != null) {
       await _controller!.dispose();
+      _controller = null;
     }
-
-    if (cameras.isEmpty) {
+    if (mounted) {
       setState(() {
         _isCameraInitialized = false;
       });
-      return;
     }
+  }
 
-    final CameraDescription camera = cameras.first;
-    _controller = CameraController(
-      camera,
-      ResolutionPreset.high,
-      enableAudio: false,
-      imageFormatGroup: ImageFormatGroup.jpeg,
-    );
+  Future<void> _initializeCamera() async {
+  if (_controller != null) {
+    await _disposeCamera();
+  }
 
-    try {
-      await _controller!.initialize();
-      await _controller!.lockCaptureOrientation(DeviceOrientation.portraitUp);
-      await _controller!.setFlashMode(_flashMode); 
+  final cameras = await availableCameras();
+  if (cameras.isEmpty) {
+    setState(() {
+      _isCameraInitialized = false;
+    });
+    return;
+  }
+
+  final camera = cameras.first;
+  _controller = CameraController(
+    camera,
+    ResolutionPreset.high,
+    enableAudio: false,
+    imageFormatGroup: ImageFormatGroup.jpeg,
+  );
+
+  try {
+    await _controller!.initialize();
+    await _controller!.lockCaptureOrientation(DeviceOrientation.portraitUp);
+    await _controller!.setFlashMode(_flashMode);
+    if (mounted) {
       setState(() {
         _isCameraInitialized = true;
       });
-    } on CameraException catch (e) {
-      debugPrint('Error initializing camera: $e');
-      String errorMessage = 'Failed to initialize camera. ';
-      if (e.code == 'CameraAccess') {
-        errorMessage += 'Camera access is disabled. Please check your device settings.';
-      } else {
-        errorMessage += 'Please restart the app.';
-      }
-      setState(() {
-        _isCameraInitialized = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      }
     }
+  } on CameraException catch (e) {
+    debugPrint('Error initializing camera: $e');
+    setState(() {
+      _isCameraInitialized = false;
+    });
   }
+}
 
   Future<void> _toggleFlash({bool forceOff = false}) async {
-    if (_controller == null) return;
+    if (_controller == null || !_controller!.value.isInitialized) return;
 
     try {
       FlashMode newMode;
@@ -145,72 +151,94 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
 
   @override
   Widget build(BuildContext context) {
-    if (!_isCameraInitialized) {
+    if (!_isCameraInitialized || _controller == null) {
       return const Scaffold(
         body: Center(
-          child: Text('Failed to initialize camera. Please restart the app.'),
+          child: CircularProgressIndicator(),
         ),
       );
     }
 
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            CameraPreview(_controller!),
-            CustomPaint(
-              painter: OverlayPainter(),
-              child: Container(),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+      body: Stack(
+        alignment: Alignment.center,
         children: [
-          FloatingActionButton(
-            heroTag: "toggleFlash", 
-            onPressed: _toggleFlash,
-            child: Icon(
-              _flashMode == FlashMode.torch ? Icons.flash_on : Icons.flash_off,
-              size: 24,
-            ),
+          CameraPreview(_controller!),
+          CustomPaint(
+            painter: OverlayPainter(),
+            child: Container(),
           ),
-          const SizedBox(height: 16),
-          FloatingActionButton(
-            heroTag: "takePicture",
-            onPressed: () async {
-              try {
-                final image = await _controller!.takePicture();
-                debugPrint('Picture taken: ${image.path}');
-                await _toggleFlash(forceOff: true); 
-                final croppedImage = await cropTo800x600(image.path);
-                debugPrint('Image cropped: $croppedImage');
-                if (!mounted) return;
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => DisplayPictureScreen(imagePath: croppedImage),
-                  ),
-                );
-              } catch (e) {
-                debugPrint('Error taking picture: $e');
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to take picture: $e')),
-                  );
-                }
-              }
-            },
-            child: const Icon(Icons.camera_alt, size: 36),
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.3,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text(
+                "Ensure the test site is within the highlighted box",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ],
       ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(),
+            FloatingActionButton(
+              heroTag: "toggleFlash",
+              onPressed: _toggleFlash,
+              child: Icon(
+                _flashMode == FlashMode.torch ? Icons.flash_on : Icons.flash_off,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            SizedBox(
+              width: 80,
+              height: 80,
+              child: FloatingActionButton(
+                heroTag: "takePicture",
+                onPressed: () async {
+                  try {
+                    final image = await _controller!.takePicture();
+                    await _toggleFlash(forceOff: true);
+                    final croppedImage = await cropTo800x600(image.path);
+                    if (!mounted) return;
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => DisplayPictureScreen(imagePath: croppedImage),
+                      ),
+                    );
+                  } catch (e) {
+                    debugPrint('Error taking picture: $e');
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to take picture: $e')),
+                      );
+                    }
+                  }
+                },
+                child: const Icon(Icons.camera_alt, size: 48),
+              ),
+            ),
+            const Spacer(),
+          ],
+        ),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+
     );
   }
 }
+
 class OverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -340,7 +368,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
 
   Future<String> sendImageToServer(String imagePath) async {
     try {
-      var uri = Uri.parse(dotenv.env['API_URL'] ?? '');
+       var uri = Uri.parse('https://seal-app-8f9gu.ondigitalocean.app/predict');
       debugPrint('Sending request to: $uri');
 
       var request = http.MultipartRequest('POST', uri);
@@ -462,8 +490,9 @@ class ProcessedImageScreen extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Image saved to ${savedImage.path}')),
       );
-      Navigator.of(context).pushReplacement(
+      Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const TakePictureScreen()),
+        (Route<dynamic> route) => false,
       );
     } catch (e) {
       if (!context.mounted) return;
@@ -478,22 +507,21 @@ class ProcessedImageScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Processed Image')),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AspectRatio(
-              aspectRatio: 800 / 600,
-              child: Image.file(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.file(
                 File(imagePath),
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => saveImage(context),
-              child: const Text('Save Image', style: TextStyle(fontSize: 18)),
-            ),
-          ],
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => saveImage(context),
+                child: const Text('Save Image', style: TextStyle(fontSize: 18)),
+              ),
+            ],
+          ),
         ),
       ),
     );
