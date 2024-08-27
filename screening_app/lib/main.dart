@@ -13,7 +13,6 @@ import 'package:file_picker/file_picker.dart';
 late List<CameraDescription> cameras;
 
 Future<void> main() async {
-  //await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   try {
     cameras = await availableCameras();
@@ -86,42 +85,41 @@ class TakePictureScreenState extends State<TakePictureScreen> with WidgetsBindin
   }
 
   Future<void> _initializeCamera() async {
-  if (_controller != null) {
-    await _disposeCamera();
-  }
+    if (_controller != null) {
+      await _disposeCamera();
+    }
 
-  final cameras = await availableCameras();
-  if (cameras.isEmpty) {
-    setState(() {
-      _isCameraInitialized = false;
-    });
-    return;
-  }
-
-  final camera = cameras.first;
-  _controller = CameraController(
-    camera,
-    ResolutionPreset.high,
-    enableAudio: false,
-    imageFormatGroup: ImageFormatGroup.jpeg,
-  );
-
-  try {
-    await _controller!.initialize();
-    await _controller!.lockCaptureOrientation(DeviceOrientation.portraitUp);
-    await _controller!.setFlashMode(_flashMode);
-    if (mounted) {
+    if (cameras.isEmpty) {
       setState(() {
-        _isCameraInitialized = true;
+        _isCameraInitialized = false;
+      });
+      return;
+    }
+
+    final camera = cameras.first;
+    _controller = CameraController(
+      camera,
+      ResolutionPreset.high,
+      enableAudio: false,
+      imageFormatGroup: ImageFormatGroup.jpeg,
+    );
+
+    try {
+      await _controller!.initialize();
+      await _controller!.lockCaptureOrientation(DeviceOrientation.portraitUp);
+      await _controller!.setFlashMode(_flashMode);
+      if (mounted) {
+        setState(() {
+          _isCameraInitialized = true;
+        });
+      }
+    } on CameraException catch (e) {
+      debugPrint('Error initializing camera: $e');
+      setState(() {
+        _isCameraInitialized = false;
       });
     }
-  } on CameraException catch (e) {
-    debugPrint('Error initializing camera: $e');
-    setState(() {
-      _isCameraInitialized = false;
-    });
   }
-}
 
   Future<void> _toggleFlash({bool forceOff = false}) async {
     if (_controller == null || !_controller!.value.isInitialized) return;
@@ -151,90 +149,86 @@ class TakePictureScreenState extends State<TakePictureScreen> with WidgetsBindin
 
   @override
   Widget build(BuildContext context) {
-    if (!_isCameraInitialized || _controller == null) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          CameraPreview(_controller!),
-          CustomPaint(
-            painter: OverlayPainter(),
-            child: Container(),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.3,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(8),
+      body: _isCameraInitialized
+          ? Stack(
+              alignment: Alignment.center,
+              children: [
+                CameraPreview(_controller!),
+                CustomPaint(
+                  painter: OverlayPainter(),
+                  child: Container(),
+                ),
+                Positioned(
+                  top: MediaQuery.of(context).size.height * 0.3,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      "Ensure the test site is within the highlighted box",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : const Center(child: CircularProgressIndicator()),
+      floatingActionButton: _isCameraInitialized
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(),
+                  FloatingActionButton(
+                    heroTag: "toggleFlash",
+                    onPressed: _toggleFlash,
+                    child: Icon(
+                      _flashMode == FlashMode.torch ? Icons.flash_on : Icons.flash_off,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  SizedBox(
+                    width: 80,
+                    height: 80,
+                    child: FloatingActionButton(
+                      heroTag: "takePicture",
+                      onPressed: () async {
+                        try {
+                          final image = await _controller!.takePicture();
+                          await _toggleFlash(forceOff: true);
+                          final croppedImage = await cropTo800x600(image.path);
+                          if (!mounted) return;
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => DisplayPictureScreen(imagePath: croppedImage),
+                            ),
+                          );
+                          _initializeCamera();
+                        } catch (e) {
+                          debugPrint('Error taking picture: $e');
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Failed to take picture: $e')),
+                            );
+                          }
+                        }
+                      },
+                      child: const Icon(Icons.camera_alt, size: 48),
+                    ),
+                  ),
+                  const Spacer(),
+                ],
               ),
-              child: const Text(
-                "Ensure the test site is within the highlighted box",
-                style: TextStyle(color: Colors.white, fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Spacer(),
-            FloatingActionButton(
-              heroTag: "toggleFlash",
-              onPressed: _toggleFlash,
-              child: Icon(
-                _flashMode == FlashMode.torch ? Icons.flash_on : Icons.flash_off,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            SizedBox(
-              width: 80,
-              height: 80,
-              child: FloatingActionButton(
-                heroTag: "takePicture",
-                onPressed: () async {
-                  try {
-                    final image = await _controller!.takePicture();
-                    await _toggleFlash(forceOff: true);
-                    final croppedImage = await cropTo800x600(image.path);
-                    if (!mounted) return;
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => DisplayPictureScreen(imagePath: croppedImage),
-                      ),
-                    );
-                  } catch (e) {
-                    debugPrint('Error taking picture: $e');
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed to take picture: $e')),
-                      );
-                    }
-                  }
-                },
-                child: const Icon(Icons.camera_alt, size: 48),
-              ),
-            ),
-            const Spacer(),
-          ],
-        ),
-      ),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-
     );
   }
 }
@@ -410,45 +404,55 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Confirm Image')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AspectRatio(
-              aspectRatio: 800 / 600,
-              child: Image.file(
-                File(widget.imagePath),
-                fit: BoxFit.cover,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pop();
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Confirm Image'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AspectRatio(
+                aspectRatio: 800 / 600,
+                child: Image.file(
+                  File(widget.imagePath),
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: _isLoading ? null : () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Retake', style: TextStyle(fontSize: 18)),
-                ),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _processImage,
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : const Text('Confirm', style: TextStyle(fontSize: 18)),
-                ),
-              ],
-            ),
-          ],
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+                    child: const Text('Retake', style: TextStyle(fontSize: 18)),
+                  ),
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _processImage,
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text('Confirm', style: TextStyle(fontSize: 18)),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -504,23 +508,41 @@ class ProcessedImageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Processed Image')),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.file(
-                File(imagePath),
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () => saveImage(context),
-                child: const Text('Save Image', style: TextStyle(fontSize: 18)),
-              ),
-            ],
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const TakePictureScreen()),
+        );
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Processed Image'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const TakePictureScreen()),
+              );
+            },
+          ),
+        ),
+        body: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.file(
+                  File(imagePath),
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => saveImage(context),
+                  child: const Text('Save Image', style: TextStyle(fontSize: 18)),
+                ),
+              ],
+            ),
           ),
         ),
       ),
