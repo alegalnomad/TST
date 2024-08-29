@@ -23,11 +23,13 @@ def read_image_file(file):
 def center_crop(image, crop_width, crop_height):
     img_height, img_width = image.shape[:2]
     
+    # Calculate the crop coordinates
     x1 = max(0, img_width // 2 - crop_width // 2)
     y1 = max(0, img_height // 2 - crop_height // 2)
     x2 = min(img_width, x1 + crop_width)
     y2 = min(img_height, y1 + crop_height)
     
+    # Crop the image
     return image[y1:y2, x1:x2]
 
 @app.route('/predict', methods=['POST'])
@@ -44,21 +46,35 @@ def predict():
         
             img = read_image_file(file)  
 
-            crop_width = 600
-            crop_height = 500
+            
+            kernel = np.array([[0, -1, 0],
+                   [-1, 5,-1],
+                   [0, -1, 0]])
+            image_sharp = cv2.filter2D(src=img, ddepth=-1, kernel=kernel)
 
-            # Perform center-weighted crop
-            cropped_img = center_crop(img, crop_width, crop_height)
-           
-            original_cropped = cropped_img.copy()
+            original_cropped = image_sharp.copy()
             original_cropped = cv2.cvtColor(original_cropped, cv2.COLOR_BGR2RGB)
 
             logging.info("Starting hair removal")
-            img_no_hair = hairremoval(cropped_img)
+            img_no_hair = hairremoval(image_sharp)
             logging.info("Hair removal complete")
 
+            blur = cv2.GaussianBlur(img, (3, 3), 0)
+
+            b, g, r = cv2.split(blur)
+
+            alpha = 1 
+            beta = 1.6
+
+            modified_g = cv2.multiply(g, alpha)
+            modified_r = cv2.multiply(r, beta)
+            modified_b = cv2.multiply(b, beta)
+
+            modified_img = cv2.merge((modified_b, modified_g, modified_r))
+            modified_img = np.clip(modified_img, 0, 255).astype(np.uint8)
+
             logging.info("Starting bounding box detection")
-            bbox = bounding_box(img_no_hair)
+            bbox = bounding_box(modified_img)
             print("Bounding Box: ", bbox)
             logging.info("Bounding box detection complete")
 
