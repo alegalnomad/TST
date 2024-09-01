@@ -20,17 +20,6 @@ def read_image_file(file):
     nparr = np.frombuffer(file.read(), np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     return img
-def center_crop(image, crop_width, crop_height):
-    img_height, img_width = image.shape[:2]
-    
-    # Calculate the crop coordinates
-    x1 = max(0, img_width // 2 - crop_width // 2)
-    y1 = max(0, img_height // 2 - crop_height // 2)
-    x2 = min(img_width, x1 + crop_width)
-    y2 = min(img_height, y1 + crop_height)
-    
-    # Crop the image
-    return image[y1:y2, x1:x2]
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -59,7 +48,7 @@ def predict():
             img_no_hair = hairremoval(image_sharp)
             logging.info("Hair removal complete")
 
-            blur = cv2.GaussianBlur(img, (3, 3), 0)
+            blur = cv2.GaussianBlur(img_no_hair, (3, 3), 0)
 
             b, g, r = cv2.split(blur)
 
