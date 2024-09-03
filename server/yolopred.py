@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 # Load a model
-model = YOLO("C:/Users/anand/OneDrive - The University of Nottingham/MScProject/app/best.pt")  # pretrained YOLOv8n model
+model = YOLO("best.pt")  # pretrained YOLOv8n model
 
 def resize_image(img, target_size=(600, 450)):
     return cv2.resize(img, target_size)
