@@ -47,7 +47,7 @@ def predict():
             b, g, r = cv2.split(blur)
 
             alpha = 1 
-            beta = 1.6
+            beta = 1.65
 
             modified_g = cv2.multiply(g, alpha)
             modified_r = cv2.multiply(r, beta)
@@ -61,13 +61,8 @@ def predict():
             print("Bounding Box: ", bbox)
             logging.info("Bounding box detection complete")
 
-            kernel = np.array([[0, -1, 0],
-                   [-1, 5,-1],
-                   [0, -1, 0]])
-            image_sharp = cv2.filter2D(src=img_no_hair, ddepth=-1, kernel=kernel)
-
             logging.info("Starting area prediction")
-            prediction = area_predict(image_sharp, bbox)
+            prediction = area_predict(img_no_hair, bbox)
             logging.info("Area prediction complete")
             if len(prediction.shape) == 2 or prediction.shape[2] == 1:
                 prediction = cv2.cvtColor(prediction, cv2.COLOR_GRAY2RGB)
