@@ -31,7 +31,7 @@ def bounding_box(image):
         print("Trying YOLOInfer with horizontal center crop")
         
         # Perform horizontal center crop
-        target_width = 600
+        target_width = 450
         cropped_image, crop_coords = horizontal_center_crop(image, target_width)
         
         # Resize the cropped image to maintain aspect ratio
