@@ -35,12 +35,6 @@ def predict():
         
             img = read_image_file(file)  
 
-            
-            # kernel = np.array([[0, -1, 0],
-            #        [-1, 5,-1],
-            #        [0, -1, 0]])
-            # image_sharp = cv2.filter2D(src=img, ddepth=-1, kernel=kernel)
-
             original_cropped = img.copy()
             original_cropped = cv2.cvtColor(original_cropped, cv2.COLOR_BGR2RGB)
 
@@ -67,8 +61,13 @@ def predict():
             print("Bounding Box: ", bbox)
             logging.info("Bounding box detection complete")
 
+            kernel = np.array([[0, -1, 0],
+                   [-1, 5,-1],
+                   [0, -1, 0]])
+            image_sharp = cv2.filter2D(src=img_no_hair, ddepth=-1, kernel=kernel)
+
             logging.info("Starting area prediction")
-            prediction = area_predict(img_no_hair, bbox)
+            prediction = area_predict(image_sharp, bbox)
             logging.info("Area prediction complete")
             if len(prediction.shape) == 2 or prediction.shape[2] == 1:
                 prediction = cv2.cvtColor(prediction, cv2.COLOR_GRAY2RGB)
