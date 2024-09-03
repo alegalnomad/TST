@@ -47,7 +47,7 @@ def predict():
             b, g, r = cv2.split(blur)
 
             alpha = 1 
-            beta = 1.65
+            beta = 1.6
 
             modified_g = cv2.multiply(g, alpha)
             modified_r = cv2.multiply(r, beta)
