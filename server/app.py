@@ -41,8 +41,14 @@ def predict():
             logging.info("Starting hair removal")
             img_no_hair = hairremoval(img)
             logging.info("Hair removal complete")
+                # preprocess: cut-off and max-min normalization
+            lower_bound, upper_bound = np.percentile(img_no_hair, 1), np.percentile(img_no_hair, 99)
+            image_data_pre = np.clip(img_no_hair, lower_bound, upper_bound)
+            image_data_pre = (image_data_pre - np.min(image_data_pre))/(np.max(image_data_pre)-np.min(image_data_pre))*255.0
+            image_data_pre[img_no_hair==0] = 0
+            image_data_pre = np.uint8(image_data_pre)   
 
-            blur = cv2.GaussianBlur(img_no_hair, (3, 3), 0)
+            blur = cv2.GaussianBlur(image_data_pre, (3, 3), 0)
 
             b, g, r = cv2.split(blur)
 
@@ -62,7 +68,7 @@ def predict():
             logging.info("Bounding box detection complete")
 
             logging.info("Starting area prediction")
-            prediction = area_predict(img_no_hair, bbox)
+            prediction = area_predict(image_data_pre, bbox)
             logging.info("Area prediction complete")
             if len(prediction.shape) == 2 or prediction.shape[2] == 1:
                 prediction = cv2.cvtColor(prediction, cv2.COLOR_GRAY2RGB)

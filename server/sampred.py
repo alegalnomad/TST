@@ -20,17 +20,10 @@ def area_predict(image, box):
         return image 
     
     box = np.array(box).reshape(1, 4) 
-    input_size = image.shape[:2]
-
-    # preprocess: cut-off and max-min normalization
-    lower_bound, upper_bound = np.percentile(image, 0.5), np.percentile(image, 99.5)
-    image_data_pre = np.clip(image, lower_bound, upper_bound)
-    image_data_pre = (image_data_pre - np.min(image_data_pre))/(np.max(image_data_pre)-np.min(image_data_pre))*255.0
-    image_data_pre[image==0] = 0
-    image_data_pre = np.uint8(image_data_pre)    
+    input_size = image.shape[:2] 
 
     #resizing the image
-    resized_image = cv2.resize(image_data_pre, (600, 450))
+    resized_image = cv2.resize(image, (600, 450))
     resize_image = sam_transform.apply_image(resized_image)
     image_tensor = torch.from_numpy(resize_image).float().permute(2, 0, 1) #Convert to C,H,W
     input_image = sam_model.preprocess(image_tensor.unsqueeze(0))  
