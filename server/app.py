@@ -36,16 +36,16 @@ def predict():
             img = read_image_file(file)  
 
             
-            kernel = np.array([[0, -1, 0],
-                   [-1, 5,-1],
-                   [0, -1, 0]])
-            image_sharp = cv2.filter2D(src=img, ddepth=-1, kernel=kernel)
+            # kernel = np.array([[0, -1, 0],
+            #        [-1, 5,-1],
+            #        [0, -1, 0]])
+            # image_sharp = cv2.filter2D(src=img, ddepth=-1, kernel=kernel)
 
-            original_cropped = image_sharp.copy()
+            original_cropped = img.copy()
             original_cropped = cv2.cvtColor(original_cropped, cv2.COLOR_BGR2RGB)
 
             logging.info("Starting hair removal")
-            img_no_hair = hairremoval(image_sharp)
+            img_no_hair = hairremoval(img)
             logging.info("Hair removal complete")
 
             blur = cv2.GaussianBlur(img_no_hair, (3, 3), 0)
