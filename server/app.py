@@ -21,6 +21,21 @@ def read_image_file(file):
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     return img
 
+def remove_shadows(image, amount=0.4):
+    rgb_planes = cv2.split(image)
+    result_planes = []
+    
+    for plane in rgb_planes:
+        dilated_img = cv2.dilate(plane, np.ones((7,7), np.uint8))
+        bg_img = cv2.medianBlur(dilated_img, 21)
+        diff_img = 255 - cv2.absdiff(plane, bg_img)
+        
+        # Blend the original and the shadow-free image
+        result_planes.append(cv2.addWeighted(plane, 1 - amount, diff_img, amount, 0))
+    
+    result = cv2.merge(result_planes)
+    return result
+
 @app.route('/predict', methods=['POST'])
 def predict():
     if request.method == 'POST':
@@ -48,7 +63,9 @@ def predict():
             image_data_pre[img_no_hair==0] = 0
             image_data_pre = np.uint8(image_data_pre)   
 
-            blur = cv2.GaussianBlur(image_data_pre, (3, 3), 0)
+            image_no_shadow = remove_shadows(image_data_pre)
+
+            blur = cv2.GaussianBlur(image_no_shadow, (3, 3), 0)
 
             b, g, r = cv2.split(blur)
 
