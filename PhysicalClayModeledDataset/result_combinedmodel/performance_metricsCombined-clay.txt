@@ -1,0 +1,45 @@
+Performance Metrics Summary
+===========================
+
+Total images processed: 25
+
+Dice Coefficient Metrics:
+  Average: 0.6193
+  Median: 0.7595
+  Standard Deviation: 0.3077
+  Minimum: 0.0000
+  Maximum: 0.9246
+
+IoU Score Metrics:
+  Average: 0.5099
+  Median: 0.6122
+  Standard Deviation: 0.2787
+  Minimum: 0.0000
+  Maximum: 0.8598
+
+Individual Image Metrics:
+  WhatsApp Image 2024-09-03 at 11.00.20_71391236.jpg: Dice=0.3786, IoU=0.2335
+  WhatsApp Image 2024-09-03 at 11.00.20_975209d5.jpg: Dice=0.7174, IoU=0.5593
+  WhatsApp Image 2024-09-03 at 11.00.21_2adbaf57.jpg: Dice=0.7861, IoU=0.6475
+  WhatsApp Image 2024-09-03 at 11.00.21_32ee3ec6.jpg: Dice=0.8482, IoU=0.7364
+  WhatsApp Image 2024-09-03 at 11.00.21_4f22c9c5.jpg: Dice=0.8409, IoU=0.7255
+  WhatsApp Image 2024-09-03 at 11.00.21_944000c3.jpg: Dice=0.8818, IoU=0.7886
+  WhatsApp Image 2024-09-03 at 11.00.21_ad75ecf3.jpg: Dice=0.4656, IoU=0.3035
+  WhatsApp Image 2024-09-03 at 11.00.21_b14371ea.jpg: Dice=0.7231, IoU=0.5663
+  WhatsApp Image 2024-09-03 at 11.00.21_ce012a68.jpg: Dice=0.8403, IoU=0.7246
+  WhatsApp Image 2024-09-03 at 11.00.21_d0e3dd49.jpg: Dice=0.0000, IoU=0.0000
+  WhatsApp Image 2024-09-03 at 11.00.21_f35728db.jpg: Dice=0.5115, IoU=0.3437
+  WhatsApp Image 2024-09-03 at 11.00.21_f6e3026c.jpg: Dice=0.8049, IoU=0.6735
+  WhatsApp Image 2024-09-03 at 11.00.22_c21d3faf.jpg: Dice=0.3995, IoU=0.2496
+  WhatsApp Image 2024-09-03 at 20.24.49_0cb96d2e.jpg: Dice=0.9219, IoU=0.8551
+  WhatsApp Image 2024-09-03 at 20.24.49_3a87b8a6.jpg: Dice=0.7953, IoU=0.6601
+  WhatsApp Image 2024-09-03 at 20.24.49_abb8af43.jpg: Dice=0.8357, IoU=0.7177
+  WhatsApp Image 2024-09-03 at 20.24.49_c04a8ec0.jpg: Dice=0.6755, IoU=0.5101
+  WhatsApp Image 2024-09-03 at 20.24.50_4b78b980.jpg: Dice=0.0000, IoU=0.0000
+  WhatsApp Image 2024-09-03 at 20.24.50_565e34de.jpg: Dice=0.7595, IoU=0.6122
+  WhatsApp Image 2024-09-03 at 20.24.50_60f03f6a.jpg: Dice=0.0000, IoU=0.0000
+  WhatsApp Image 2024-09-03 at 20.24.50_8feed04d.jpg: Dice=0.6928, IoU=0.5300
+  WhatsApp Image 2024-09-03 at 20.24.50_931b2393.jpg: Dice=0.8680, IoU=0.7667
+  WhatsApp Image 2024-09-03 at 20.24.50_ae964218.jpg: Dice=0.8114, IoU=0.6827
+  WhatsApp Image 2024-09-03 at 20.24.51_79bf29b6.jpg: Dice=0.0000, IoU=0.0000
+  WhatsApp Image 2024-09-03 at 20.24.51_93cbe1c8.jpg: Dice=0.9246, IoU=0.8598

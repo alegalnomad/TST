@@ -1,0 +1,56 @@
+Performance Metrics Summary
+===========================
+
+Total images processed: 36
+
+Dice Coefficient Metrics:
+  Average: 0.7395
+  Median: 0.9123
+  Standard Deviation: 0.3455
+  Minimum: 0.0000
+  Maximum: 0.9759
+
+IoU Score Metrics:
+  Average: 0.6771
+  Median: 0.8388
+  Standard Deviation: 0.3331
+  Minimum: 0.0000
+  Maximum: 0.9530
+
+Individual Image Metrics:
+  1.png: Dice=0.9495, IoU=0.9038
+  10.png: Dice=0.7963, IoU=0.6616
+  11.png: Dice=0.8474, IoU=0.7351
+  12.png: Dice=0.8825, IoU=0.7896
+  13.png: Dice=0.5895, IoU=0.4179
+  14.png: Dice=0.8430, IoU=0.7286
+  15.png: Dice=0.9613, IoU=0.9254
+  16.png: Dice=0.4318, IoU=0.2753
+  17.png: Dice=0.9104, IoU=0.8355
+  18.png: Dice=0.9143, IoU=0.8421
+  19.png: Dice=0.9064, IoU=0.8288
+  2.png: Dice=0.8521, IoU=0.7423
+  20.png: Dice=0.9351, IoU=0.8780
+  21.png: Dice=0.9596, IoU=0.9224
+  22.png: Dice=0.9651, IoU=0.9325
+  23.png: Dice=0.9667, IoU=0.9355
+  24.png: Dice=0.9535, IoU=0.9112
+  25.png: Dice=0.9398, IoU=0.8865
+  26.png: Dice=0.9327, IoU=0.8739
+  27.png: Dice=0.9307, IoU=0.8705
+  28.png: Dice=0.0000, IoU=0.0000
+  29.png: Dice=0.9759, IoU=0.9530
+  3.png: Dice=0.0000, IoU=0.0000
+  30.png: Dice=0.9281, IoU=0.8659
+  31.png: Dice=0.9444, IoU=0.8947
+  32.png: Dice=0.9649, IoU=0.9321
+  33.png: Dice=0.0269, IoU=0.0136
+  34.png: Dice=0.0000, IoU=0.0000
+  35.png: Dice=0.0000, IoU=0.0000
+  36.png: Dice=0.8362, IoU=0.7185
+  4.png: Dice=0.0000, IoU=0.0000
+  5.png: Dice=0.9398, IoU=0.8864
+  6.png: Dice=0.9693, IoU=0.9403
+  7.png: Dice=0.9721, IoU=0.9457
+  8.png: Dice=0.7677, IoU=0.6230
+  9.png: Dice=0.8278, IoU=0.7062

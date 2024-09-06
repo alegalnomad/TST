@@ -1,0 +1,33 @@
+Image Name,Dice Score,IoU Score
+WhatsApp Image 2024-09-03 at 11.00.20_71391236.jpg,0.5584,0.3874
+WhatsApp Image 2024-09-03 at 11.00.20_975209d5.jpg,0.7384,0.5853
+WhatsApp Image 2024-09-03 at 11.00.21_2adbaf57.jpg,0.8987,0.8160
+WhatsApp Image 2024-09-03 at 11.00.21_32ee3ec6.jpg,0.9259,0.8620
+WhatsApp Image 2024-09-03 at 11.00.21_4f22c9c5.jpg,0.9051,0.8267
+WhatsApp Image 2024-09-03 at 11.00.21_944000c3.jpg,0.9371,0.8817
+WhatsApp Image 2024-09-03 at 11.00.21_ad75ecf3.jpg,0.9280,0.8657
+WhatsApp Image 2024-09-03 at 11.00.21_b14371ea.jpg,0.8950,0.8100
+WhatsApp Image 2024-09-03 at 11.00.21_ce012a68.jpg,0.9443,0.8945
+WhatsApp Image 2024-09-03 at 11.00.21_d0e3dd49.jpg,0.7080,0.5480
+WhatsApp Image 2024-09-03 at 11.00.21_f35728db.jpg,0.8468,0.7343
+WhatsApp Image 2024-09-03 at 11.00.21_f6e3026c.jpg,0.9195,0.8510
+WhatsApp Image 2024-09-03 at 11.00.22_c21d3faf.jpg,0.8398,0.7238
+WhatsApp Image 2024-09-03 at 20.24.49_0cb96d2e.jpg,0.9382,0.8835
+WhatsApp Image 2024-09-03 at 20.24.49_3a87b8a6.jpg,0.8606,0.7553
+WhatsApp Image 2024-09-03 at 20.24.49_abb8af43.jpg,0.8943,0.8088
+WhatsApp Image 2024-09-03 at 20.24.49_c04a8ec0.jpg,0.7882,0.6504
+WhatsApp Image 2024-09-03 at 20.24.50_4b78b980.jpg,0.7782,0.6369
+WhatsApp Image 2024-09-03 at 20.24.50_565e34de.jpg,0.8142,0.6866
+WhatsApp Image 2024-09-03 at 20.24.50_60f03f6a.jpg,0.6608,0.4934
+WhatsApp Image 2024-09-03 at 20.24.50_8feed04d.jpg,0.8195,0.6941
+WhatsApp Image 2024-09-03 at 20.24.50_931b2393.jpg,0.8638,0.7603
+WhatsApp Image 2024-09-03 at 20.24.50_ae964218.jpg,0.7739,0.6312
+WhatsApp Image 2024-09-03 at 20.24.51_79bf29b6.jpg,0.9229,0.8568
+WhatsApp Image 2024-09-03 at 20.24.51_93cbe1c8.jpg,0.9341,0.8764
+
+Summary Statistics:
+Number of images processed: 25
+Average Dice Score: 0.8437
+Average IoU Score: 0.7408
+Best Dice Score: 0.9443
+Worst Dice Score: 0.5584
